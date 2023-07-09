@@ -1,0 +1,244 @@
+%! Author = Jander Moreira
+%! Email =  moreira.jander@gmail.com
+
+\documentclass[a4paper, 11pt]{article}
+\usepackage[T1]{fontenc}
+
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{textcomp}
+\usepackage[all]{nowidow}
+\usepackage{tikz}
+
+% \usepackage{array}
+
+\usepackage{enumitem}
+\setlist{nosep}
+
+\usepackage{versionchanges}
+
+
+%% Layout
+
+% geometry
+\usepackage{geometry}
+\geometry{top = 2.5cm, bottom = 2cm, right = 2.5cm, left = 4cm}
+
+% hyperref
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks,
+    urlcolor = blue!20!black,
+    linkcolor = blue!10!black,
+    citecolor = black!80,
+}
+
+% cleveref
+\usepackage{cleveref}
+
+% makeidx
+\usepackage{makeidx}
+\makeindex
+
+% minted
+\usepackage[outputdir = ../out]{minted}
+% \usemintedstyle{borland}
+\newminted{latex}{autogobble, breaklines, bgcolor = blue!5, fontsize = \footnotesize}
+\newmintinline{latex}{}
+%
+% tcolorbox
+\usepackage{tcolorbox}
+\usepackage{color}
+\usepackage{comment}
+\tcbuselibrary{skins, listings, minted, breakable}
+\tcbset{
+    colback = blue!3,
+    sharp corners,
+    box align = top,
+    boxrule = 0pt,
+    fontupper = \footnotesize,
+    fontlower = \footnotesize,
+    minted options={
+        fontsize = \footnotesize,
+        breaklines,
+        autogobble,
+    },
+    listing engine = minted,
+}
+
+%% Text support
+
+% macro arguments formats
+\colorlet{argumentcolor}{orange!50!black}
+\NewDocumentCommand{\Argument}{ m }{%
+    \textcolor{argumentcolor}{$\langle$\normalfont\small\textsl{#1}$\rangle$}%
+}
+\NewDocumentCommand{\MArg}{ m }{\mbox{\texttt{\{}\Argument{#1}\texttt{\}}}}
+\NewDocumentCommand{\OArg}{ m }{\mbox{\texttt{[}\Argument{#1}\texttt{]}}}
+\NewDocumentCommand{\LArg}{ m }{\mbox{\texttt{<}\Argument{#1}\texttt{>}}}
+\NewDocumentCommand{\PackageName}{ m }{\mbox{\textsf{#1}}}
+\NewDocumentCommand{\Deprecated}{}{\textcolor{red!80!black}{(deprecated)}}
+\NewDocumentCommand{\FromPackage}{ m }{%
+    \tikz\node[draw, rounded corners = 1.5pt, inner sep = 1.5pt,
+        font = \sffamily\tiny] {#1};%
+}
+\NewDocumentCommand{\Empty}{}{%
+    \mbox{\normalfont\textcolor{black!60}{\textsl{--empty--}}}
+}
+\NewDocumentCommand{\Option}{ m }{%
+    \mbox{\textcolor{green!40!black}{\texttt{#1}}}%
+}
+\NewDocumentCommand{\OptionInd}{ m }{%
+    \index{#1@\texttt{#1}}%
+    \Option{#1}%
+}
+\NewDocumentCommand{\OptionRef}{ m }{%
+    \hyperref[option:#1]{\Option{#1}}%
+}
+\NewDocumentCommand{\Macro}{ m }{%
+    \expandafter\latexinline\expandafter{\csname#1\endcsname}%
+}
+\NewDocumentCommand{\MacroRef}{ m }{%
+    \hyperref[macro:#1]{\Macro{#1}}%
+}
+\NewDocumentCommand{\MacroDef}{ m }{%
+    \index{#1@\texttt{\textbackslash #1}}%
+    \refstepcounter{MacroCounter}%
+    \label{macro:#1}%
+    \Macro{#1}%
+}
+\NewDocumentCommand{\MacroRefInd}{ m }{%
+    \index{#1@\texttt{\textbackslash #1}}%
+    \MacroRef{#1}%
+}
+
+\tcbset{
+    description/.style = {
+        coltitle = black,
+        fontupper = \normalsize,
+        colbacktitle = white,
+        titlerule = 0.001pt,
+        enhanced jigsaw,
+        breakable,
+        width = \dimexpr \linewidth - 2em \relax,
+        flush right,
+        top = 0.5ex,
+        bottom = 0pt,
+        left = 0pt,
+        right = 0pt,
+        opacitybacktitle = 0,
+        opacityframe = 0,
+        opacityback = 0,
+    }
+}
+
+\NewDocumentEnvironment{macro}{ m O{} o }{%
+    %! formatter = off
+    \index{#1@\texttt{\textbackslash#1}}%
+    \refstepcounter{MacroCounter}%
+    \label{macro:#1}%
+    %! parser = off
+    \IfValueTF{#3}{%
+        \begin{macro*}{#1}{#2}
+    }{%
+        \begin{macro*}{#1}{#2}[#3]%
+    }
+    %! parser = on
+        }{%
+    %! parser = off
+    \end{macro*}
+    %! parser = on
+    %! formatter = on
+}
+\newcounter{MacroCounter}
+\NewDocumentEnvironment{macro*}{ m m o }{
+    \medskip\par%
+    \begin{tcolorbox}[
+        title = {\hspace{-2em}\Macro{#1}#2\IfValueT{#3}{\latexinline!{#3} !}},
+        description,
+    ]
+    }{
+    \end{tcolorbox}%
+    \medskip%
+}
+
+\newlength{\docassignment}
+\NewDocumentEnvironment{option}{ m m o }{%
+    \label{option:#1}%
+    \settowidth{\docassignment}{#2}%
+    \begin{tcolorbox}
+        [
+        title = {%
+            \hspace{-2em}\OptionInd{#1}%
+            \ifdim\docassignment>0pt\Option{ = #2}\fi%
+            \IfValueT{#3}{\hfill\textit{Default:} \Option{#3}}
+        },
+        description,
+        ]
+            }{
+    \end{tcolorbox}%
+    \medskip%
+}
+\NewDocumentEnvironment{option*}{ m }{%
+    \begin{tcolorbox}[title = {\hspace{-2em}#1}, description]
+    }{
+    \end{tcolorbox}%
+    \medskip%
+}
+\NewDocumentEnvironment{optionnoind}{ m m }{%
+    \begin{tcolorbox}[
+        title = {\hspace{-2em}\Option{#1 = #2}},
+        description,
+    ]
+    }{
+    \end{tcolorbox}%
+    \medskip%
+}
+
+%% Repetitive text
+\NewDocumentCommand{\MacroOptionsText}{}{%
+    Any \Argument{options} specified uniquely affect this macro.%
+}
+\NewDocumentCommand{\BlockOptionsText}{}{%
+    Any of the \Argument{options} specified in this macro will affect this command and all items in the inner block, propagating up to and including the closing macro.%
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title{%
+    The \PackageName{versionchanges} package\thanks{This document corresponds to \PackageName{versionchanges}~v\VCVersion, dated \VCDate.
+    This text was last revised \today.}%
+}
+\author{Jander Moreira -- \texttt{moreira.jander@gmail.com}}
+\date{\VCDate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+\maketitle
+\sloppy
+
+\begin{abstract}
+    The \PackageName{versionchanges} package allows to keep a record of the changes in a document.
+\end{abstract}
+
+\tableofcontents
+
+\VCChange{%
+    date = 2023/10/01,
+    version = 0.1,
+}
+\VCChange{%
+    date = 2055/10/01,
+    version = 1.2,
+}
+
+\teste{1}{date}
+\teste{2}{version}
+
+%% Index
+\printindex
+
+\end{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

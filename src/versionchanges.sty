@@ -1,0 +1,54 @@
+%! Package = changetracker
+%! Author = Jander Moreira
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{versionchanges}[2023/07/09 v0.1 This package provides means to track changes to a document]
+
+\RequirePackage{pgfkeys}
+
+\NewDocumentCommand{\VCVersion}{}{0.1}
+\NewDocumentCommand{\VCDate}{}{2023/07/09}
+
+%%
+
+\pgfkeys{
+    /versionchanges/.cd,
+    version/.code = {\vc@SetChange{version}{#1}},
+    date/.code = {\vc@SetChange{date}{#1}},
+}
+
+%% Internal commands
+\ExplSyntaxOn
+
+% StepChange: proceeds to a new change
+\int_zero_new:N \g_vc_change_counter_int
+\NewDocumentCommand{\vc@StepChange}{}{
+    \int_add:Nn \g_vc_change_counter_int { 1 }
+}
+
+% SetChange: sets the an attribute of the current change record
+% #1: attribute
+% #2: value
+\cs_new:Npn \vc@set_change_attribute:nn #1#2 {
+    \tl_clear_new:c { g_vc_change_ \int_use:N \g_vc_change_counter_int _#1_tl }
+    \tl_gset:cn { g_vc_change_ \int_use:N \g_vc_change_counter_int _#1_tl } { #2 }
+}
+\NewDocumentCommand{\vc@SetChange}{ m m }{
+    \vc@set_change_attribute:nn { #1 } { #2 }
+}
+
+\NewDocumentCommand{\teste}{mm}{
+    #1:#2=\tl_use:c { g_vc_change_#1_#2_tl }\par
+}
+
+% Change: records a change
+% #1: comma-separated list with change description
+\NewDocumentCommand{\VCChange}{ m }{%
+    \vc@StepChange
+    \pgfkeys{
+        /versionchanges/.cd,
+        #1,
+    }%
+}
+
+\ExplSyntaxOff
