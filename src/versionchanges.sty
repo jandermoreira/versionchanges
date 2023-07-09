@@ -5,25 +5,22 @@
 \ProvidesPackage{versionchanges}[2023/07/09 v0.1 This package provides means to track changes to a document]
 
 \RequirePackage{pgfkeys}
+\RequirePackage{marginnote}
+%\RequirePackage{tikz}
 
 \NewDocumentCommand{\VCVersion}{}{0.1}
 \NewDocumentCommand{\VCDate}{}{2023/07/09}
 
-%%
-
-\pgfkeys{
-    /versionchanges/.cd,
-    version/.code = {\vc@SetChange{version}{#1}},
-    date/.code = {\vc@SetChange{date}{#1}},
-}
-
 %% Internal commands
 \ExplSyntaxOn
 
-% StepChange: proceeds to a new change
+% StepChangeCounter: proceeds to a new change
 \int_zero_new:N \g_vc_change_counter_int
-\NewDocumentCommand{\vc@StepChange}{}{
+\NewDocumentCommand{\vc@StepChangeCounter}{}{
     \int_add:Nn \g_vc_change_counter_int { 1 }
+}
+\NewDocumentCommand{\vc@CurrentChangeCounter}{}{
+    \int_use:N \g_vc_change_counter_int
 }
 
 % SetChange: sets the an attribute of the current change record
@@ -37,18 +34,51 @@
     \vc@set_change_attribute:nn { #1 } { #2 }
 }
 
-\NewDocumentCommand{\teste}{mm}{
-    #1:#2=\tl_use:c { g_vc_change_#1_#2_tl }\par
-}
-
-% Change: records a change
-% #1: comma-separated list with change description
-\NewDocumentCommand{\VCChange}{ m }{%
-    \vc@StepChange
-    \pgfkeys{
-        /versionchanges/.cd,
-        #1,
-    }%
+\NewDocumentCommand{\vc@GetChangeInfo}{ m m }{
+    \tl_use:c { g_vc_change_#1_#2_tl }
 }
 
 \ExplSyntaxOff
+
+
+
+%%
+
+\pgfkeys{
+    /versionchanges/.cd,
+    version/.code = {\vc@SetChange{version}{#1}},
+    date/.code = {\vc@SetChange{date}{#1}},
+    description/.code = {\vc@SetChange{description}{#1}},
+    type/.is choice,
+    type/new/.code = {\vc@SetChange{type}{new}},
+    type/updated/.code = {\vc@SetChange{type}{updated}},
+    type/removed/.code = {\vc@SetChange{type}{removed}},
+    .unknown/.code = {\pgfkeysalso{type = \pgfkeyscurrentname}},
+}
+
+
+% Change: records a change
+% #1: comma-separated list with change description
+\NewDocumentCommand{\VCChange}{ m m }{%
+    \vc@StepChangeCounter%
+    \pgfkeys{
+        /versionchanges/.cd,
+        type = new,
+        #1,
+    }%
+%    \marginnote{%
+%        \tikz \node[draw, rounded corners, text width = 2cm, font = \tiny]{%
+%            \textsc{\vc@GetChangeInfo{\vc@CurrentChangeCounter}{type}} in
+%            v.\vc@GetChangeInfo{\vc@CurrentChangeCounter}{version}
+%        };
+%    }[-0.5em]%
+}
+
+%%
+
+\NewDocumentCommand{\vc@SaveChanges}{}{
+
+}
+
+
+\reversemarginpar
