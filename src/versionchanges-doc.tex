@@ -8,6 +8,7 @@
 \usepackage{amsmath}
 \usepackage{textcomp}
 \usepackage[all]{nowidow}
+\usepackage{xcolor}
 \usepackage{tikz}
 
 % \usepackage{array}
@@ -226,18 +227,39 @@
 \tableofcontents
 
 \VCChange{%
-    version = 0.1,
+    updated,
+    version = 0.1h,
     removed,
     description = {Document Class: article 2022/07/02 v1.4n Standard LaTeX document class},
-}
+}%
 This is old story.
 
 \VCChange{%
     version = 1.2,
     description = {new here},
     type = new,
-}
+}%
 This is new.
+\VCChange{%
+    updated,
+    version = 0.1h,
+    description = {Document Class: article 2022/07/02 v1.4n Standard \LaTeX},
+}%
+\VCChange{%
+    version = 1.2,
+    description = {\PackageName{algxpar}},
+    type = updated,
+}%
+\VCChange{%
+    version = 1.2,
+    description = {new next a \textbf{jander}},
+    type = new,
+}%
+This is new.
+
+\SaveChanges
+
+((((\teste))))
 
 %% Index
 \printindex

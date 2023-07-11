@@ -1,4 +1,4 @@
-%! Package = changetracker
+%! Package = versionchanges
 %! Author = Jander Moreira
 
 \NeedsTeXFormat{LaTeX2e}
@@ -26,20 +26,74 @@
 % SetChange: sets the an attribute of the current change record
 % #1: attribute
 % #2: value
-\cs_new:Npn \vc@set_change_attribute:nn #1#2 {
+\cs_new:Npn \set_change_attribute:nn #1#2 {
     \tl_clear_new:c { g_vc_change_ \int_use:N \g_vc_change_counter_int _#1_tl }
     \tl_gset:cn { g_vc_change_ \int_use:N \g_vc_change_counter_int _#1_tl } { #2 }
 }
 \NewDocumentCommand{\vc@SetChange}{ m m }{
-    \vc@set_change_attribute:nn { #1 } { #2 }
+    \set_change_attribute:nn { #1 } { #2 }
 }
 
+% GetChangeInfo: returns a change field
+% #1: number of the change
+% #2: field
 \NewDocumentCommand{\vc@GetChangeInfo}{ m m }{
     \tl_use:c { g_vc_change_#1_#2_tl }
 }
 
-\ExplSyntaxOff
+\NewDocumentCommand{\vc@SetMacroChangeInfo}{ m m m }{
+    \tl_clear_new:N #1
+    \exp_args:NNc \tl_set:NV #1 { g_vc_change_#2_#3_tl }
+}
 
+% RunChangesList: apply a macro to each change of a version
+% #1: version
+% #2: macro with a single mandatory argument
+\NewDocumentCommand{\vc@RunChangesList}{ m m }{
+    \seq_map_inline:cn { g_version_#1_seq } { #2 { ##1 } }
+}
+
+
+% RegisterVersion: add a version to the list os versions if it doesn't exist
+% #1: version
+\seq_new:N \g_vc_versions_list_seq
+\cs_new:Npn \register_version:n #1 {
+    \tl_clear_new:N \l_version_tl
+    \exp_args:NNe \tl_set:Nn \l_version_tl { #1 }
+    \exp_args:NNe \seq_if_in:NnTF \g_vc_versions_list_seq { \l_version_tl } { } {% else
+        \exp_args:NNe \seq_put_right:Nn \g_vc_versions_list_seq { \l_version_tl }
+    }
+}
+
+% AddChangeToVersion: add a change reference to the list of the version
+% (a new list will be created if necessary)
+% #1: version
+\cs_new:Npn \add_change_to_version:n #1  {
+    % Create a new list if it doesn't already exist
+    \seq_if_exist:cTF { g_version_#1_seq } { } {% else
+        \seq_new:c { g_version_#1_seq }
+    }
+    % Add a reference (change number) to the list
+    \tl_clear_new:N \l_change_number_tl
+    \exp_args:NNe \tl_set:Nn \l_change_number_tl { \int_use:N \g_vc_change_counter_int }
+    \exp_args:Nco \seq_gput_right:Nn { g_version_#1_seq } { \l_change_number_tl }
+}
+\NewDocumentCommand{\vc@AddChangeToVersion}{ }{
+    \register_version:n {
+        \tl_use:c { g_vc_change_ \int_use:N \g_vc_change_counter_int _version_tl }
+    }
+    \add_change_to_version:n {
+        \tl_use:c { g_vc_change_ \int_use:N \g_vc_change_counter_int _version_tl }
+    }
+}
+
+% RunVersionList: apply a macro to each version of the list
+% #1: macro with a single mandatory argument
+\NewDocumentCommand{\vc@RunVersionList}{ m }{
+    \seq_map_inline:Nn \g_vc_versions_list_seq { #1 { ##1 } }
+}
+
+\ExplSyntaxOff
 
 
 %%
@@ -59,13 +113,14 @@
 
 % Change: records a change
 % #1: comma-separated list with change description
-\NewDocumentCommand{\VCChange}{ m m }{%
+\NewDocumentCommand{\VCChange}{ m }{%
     \vc@StepChangeCounter%
     \pgfkeys{
         /versionchanges/.cd,
         type = new,
         #1,
     }%
+    \vc@AddChangeToVersion%
 %    \marginnote{%
 %        \tikz \node[draw, rounded corners, text width = 2cm, font = \tiny]{%
 %            \textsc{\vc@GetChangeInfo{\vc@CurrentChangeCounter}{type}} in
@@ -75,9 +130,21 @@
 }
 
 %%
+\NewDocumentCommand{\WriteChange}{ m }{%
+    [
+    c: \vc@SetMacroChangeInfo{\vc@InfoResult}{#1}{description}%
+    \detokenize{\def\teste}\{%
+    \expandafter\detokenize\expandafter{\vc@InfoResult}%
+    \}
+    ]\par
+}
 
-\NewDocumentCommand{\vc@SaveChanges}{}{
+\NewDocumentCommand{\Write}{ m }{
+    (Write #1:\par \vc@RunChangesList{#1}{\WriteChange})
+}
 
+\NewDocumentCommand{\SaveChanges}{}{
+    \vc@RunVersionList{\Write}
 }
 
 
