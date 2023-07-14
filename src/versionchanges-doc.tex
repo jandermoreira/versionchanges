@@ -210,7 +210,7 @@
     The \PackageName{versionchanges} package\thanks{This document corresponds to \PackageName{versionchanges}~v\VCVersion, dated \VCDate.
     This text was last revised \today.}%
 }
-\author{Jander Moreira -- \texttt{moreira.jander@gmail.com}}
+\author{Jander Moreira\\\texttt{moreira.jander@gmail.com}}
 \date{\VCDate}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -221,48 +221,81 @@
 \sloppy
 
 \begin{abstract}
-    The \PackageName{versionchanges} package allows to keep a record of the changes in a document.
+    The \PackageName{versionchanges} package allows to keep a record of the changes in a versioned document.
 \end{abstract}
 
-\tableofcontents
+% \tableofcontents
+%
+% \section{um}
+% \subsection{Process finished with exit code code}
+%
+% \VCChange{
+%     new,
+%     version = 2.0,
+%     description = hey there!!!!!!!!!,
+% }%
+%
+% \VCChange{%
+%     updated,
+%     version = 0.1h,
+%     removed,
+%     description = {Document Class: article 2022/07/02 v1.4n Standard LaTeX document class \textbf{xxxxxxxxxxxx}},
+% }%
+% This is old story.
+%
+% % \setcounter{page}{110}
+%
+% \VCChange{%
+%     version = 1.2,
+%     description = {new here},
+%     type = new,
+% }%
+% \VCChange{
+%     new,
+%     version = 2.0,
+%     description = There it goes!,
+% }%
+% This is new.
+% \VCChange{%
+%     updated,
+%     version = 0.1h,
+%     description = {Document Class: article 2022/07/02 v1.4n Standard  \LaTeX\hfill!},
+% }%
+%
+%
+% \VCChange{%
+%     version = 1.2,
+%     description = {\PackageName{algxpar}},
+%     type = updated,
+% }%
+% \VCChange{%
+%     version = 1.2,
+%     description = {new acentuação a \textbf{jander}},
+%     type = new,
+% }%
+%
+%
+% This is new. This is new. This is new. This is new. This is new. This is new. This is new.This is new.This is new.This is new. This is new. This is new.
+%
+% \VCChange{%
+%     new,
+%     version = 2.0,
+%     description = Brand new version,
+% }
+%
+%
+% %% Change history
+% \VCPrintChanges
+%
+% %% Index
+% \printindex
 
-\VCChange{%
-    updated,
-    version = 0.1h,
-    removed,
-    description = {Document Class: article 2022/07/02 v1.4n Standard LaTeX document class},
-}%
-This is old story.
+\VCVersioningCheck{v1.2beta1}
+\VCVersioningCheck{v1.0.22}
+\VCVersioningCheck{v1.2-a.b}
+\VCVersioningCheck{v0.95b.1232}
+\VCVersioningCheck{1.2.0-a.1.223123}
 
-\VCChange{%
-    version = 1.2,
-    description = {new here},
-    type = new,
-}%
-This is new.
-\VCChange{%
-    updated,
-    version = 0.1h,
-    description = {Document Class: article 2022/07/02 v1.4n Standard \LaTeX},
-}%
-\VCChange{%
-    version = 1.2,
-    description = {\PackageName{algxpar}},
-    type = updated,
-}%
-\VCChange{%
-    version = 1.2,
-    description = {new next a \textbf{jander}},
-    type = new,
-}%
-This is new.
-
-\SaveChanges
-
-((((\teste))))
-
-%% Index
-\printindex
 
 \end{document}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
