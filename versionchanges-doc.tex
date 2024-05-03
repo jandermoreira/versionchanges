@@ -42,7 +42,7 @@
 \makeindex
 
 % minted
-\usepackage[outputdir = ../out]{minted}
+\usepackage[outputdir = ./out]{minted}
 % \usemintedstyle{borland}
 \newminted{latex}{autogobble, breaklines, bgcolor = blue!5, fontsize = \footnotesize}
 \newmintinline{latex}{}
@@ -84,7 +84,7 @@
         font = \sffamily\tiny] {#1};%
 }
 \NewDocumentCommand{\Empty}{}{%
-    \mbox{\normalfont\textcolor{black!60}{\textsl{--empty--}}}
+    \mbox{\normalfont\textcolor{black!60}{\textsl{--empty--}}}%
 }
 \NewDocumentCommand{\Option}{ m }{%
     \mbox{\textcolor{green!40!black}{\texttt{#1}}}%
@@ -138,7 +138,7 @@
     \index{#1@\texttt{\textbackslash#1}}%
     \refstepcounter{MacroCounter}%
     \label{macro:#1}%
-    %! parser = off
+%! parser = off
     \IfValueTF{#3}{%
         \begin{macro*}{#1}{#2}
     }{%
@@ -146,7 +146,7 @@
     }
     %! parser = on
         }{%
-    %! parser = off
+%! parser = off
     \end{macro*}
     %! parser = on
     %! formatter = on
@@ -221,80 +221,126 @@
 \sloppy
 
 \begin{abstract}
-    The \PackageName{versionchanges} package allows to keep a record of the changes in a versioned document.
+    The \PackageName{versionchanges} package helps to keep a record of the changes in a versioned document.
 \end{abstract}
 
-% \tableofcontents
-%
-% \section{um}
-% \subsection{Process finished with exit code code}
-%
-% \VCChange{
-%     new,
-%     version = 2.0,
-%     description = hey there!!!!!!!!!,
-% }%
-%
-% \VCChange{%
-%     updated,
-%     version = 0.1h,
-%     removed,
-%     description = {Document Class: article 2022/07/02 v1.4n Standard LaTeX document class \textbf{xxxxxxxxxxxx}},
-% }%
-% This is old story.
-%
-% % \setcounter{page}{110}
-%
-% \VCChange{%
-%     version = 1.2,
-%     description = {new here},
-%     type = new,
-% }%
-% \VCChange{
-%     new,
-%     version = 2.0,
-%     description = There it goes!,
-% }%
-% This is new.
-% \VCChange{%
-%     updated,
-%     version = 0.1h,
-%     description = {Document Class: article 2022/07/02 v1.4n Standard  \LaTeX\hfill!},
-% }%
-%
-%
-% \VCChange{%
-%     version = 1.2,
-%     description = {\PackageName{algxpar}},
-%     type = updated,
-% }%
-% \VCChange{%
-%     version = 1.2,
-%     description = {new acentuação a \textbf{jander}},
-%     type = new,
-% }%
-%
-%
-% This is new. This is new. This is new. This is new. This is new. This is new. This is new.This is new.This is new.This is new. This is new. This is new.
-%
-% \VCChange{%
-%     new,
-%     version = 2.0,
-%     description = Brand new version,
-% }
-%
-%
-% %% Change history
-% \VCPrintChanges
-%
-% %% Index
-% \printindex
+\tableofcontents
 
-\VCVersioningCheck{v1.2beta1}
-\VCVersioningCheck{v1.0.22}
-\VCVersioningCheck{v1.2-a.b}
-\VCVersioningCheck{v0.95b.1232}
-\VCVersioningCheck{1.2.0-a.1.223123}
+% actual versions
+\VCRegisterVersion{0.1}{2024/05/05}
+
+% fake versions for examples
+\VCRegisterVersion{example}{1800/01/01}
+\VCRegisterVersion{example-a}{1802/01/01}
+
+\VCPrintChanges
+\textit{Warning}: \textbf{Change History} includes the examples also.
+
+
+\section{Introduction}
+
+\VCChange[disable]{
+    type = released,
+    version = 0.1,
+    description = {Initial version}
+}
+This is ``yet another'' package for tracking documentation changes. There is not much new in relation to other packages for manually marking changes, such as \PackageName{changes}\footnote{\url{https://ctan.org/pkg/changes}.}, \PackageName{marginnote}\footnote{\url{https://ctan.org/pkg/marginnote}} and \PackageName{todonotes}\footnote{\url{https://ctan.org/pkg/todonotes}.}, the latter used as support for presenting margin notes.
+
+This package, in particular, is tailored to record versions and types of changes, presenting the change as a note in the margin of the text and generating a list of changes for each version created.
+
+
+\section{Package usage}
+
+This package depends on the following packages:
+
+\begin{center}
+    \begin{tabular}{ll}
+        \PackageName{array}      & \url{https://ctan.org/pkg/array} \\
+        \PackageName{marginnote} & \url{https://ctan.org/pkg/marginnote} \\
+        \PackageName{multicol}   & \url{https://ctan.org/pkg/multicol} \\
+        \PackageName{pgfkeys}    & \url{https://www.ctan.org/pkg/pgfkeys} \\
+        \PackageName{ragged2e}   & \url{https://www.ctan.org/pkg/ragged2e} \\
+        \PackageName{todonotes}  & \url{https://www.ctan.org/pkg/todonotes} \\
+    \end{tabular}
+\end{center}
+
+To use the package, simply request its use in the preamble of the document.
+
+\begin{macro*}{usepackage}{}[versionchanges]
+    There are no package options available at this time.
+\end{macro*}
+
+
+\section{Registering version and adding changes}
+
+The first step is to register each version. This is done through \Macro{RegisterVersion}, informing the version and its date.
+
+\begin{macro}{VCRegisterVersion}[\MArg{version}\MArg{date}]
+    The argument \MArg{version} is the version number, such as 1.0, 3.2-beta and so on, and \MArg{date} is intended to registers the date of that version. Actually this date can be any text.
+\end{macro}
+
+\begin{latexcode}
+    \VCRegisterVersion{example}{1800/01/01}
+    \VCRegisterVersion{example-a}{1802/01/01}
+\end{latexcode}
+
+Any new change is registered with \Macro{VCChange}.
+
+\begin{macro}{VCChange}[\OArg{todonotes options}\MArg{change info}\OArg{header}]
+    This macro register a single change. The change info is a comma separated list with key/value pairs:
+    \begin{itemize}
+        \item \OptionInd{type}: the type of the change, which can be \OptionInd{released}, \OptionInd{new}, \OptionInd{updated}, \OptionInd{removed}, and \OptionInd{deprecated};
+        \item \OptionInd{version}: one of the registered versions (\MacroRef{VCRegisterVersion});
+        \item \OptionInd{description}: the text to the list of changes
+    \end{itemize}
+
+    \medskip
+    Among the change info, the key \OptionInd{suppress} can be specified, causing the item to be supressed from the listing.
+
+    The optional \Argument{header} is a text to be used as a header in the margin note.
+
+    A first optional argument, \Argument{todonotes options}, can be used to pass any adicional options that apply to a \PackageName{todonotes}'s \Macro{todo}. For example, if \Option{disable} is used, the margin note is hidden.
+\end{macro}
+
+\begin{tcblisting}{}
+    % Update example
+    \VCChange{type = updated, version = example, description = {All examples were replaced.}}These are all the examples for this package:\ldots
+\end{tcblisting}
+
+\begin{tcblisting}{}
+    % New example
+    \VCChange{type = new, version = example, description = {Added two-colum support.}}[Two-column]A package option were included to handle two-column documents\ldots
+\end{tcblisting}
+
+\begin{tcblisting}{}
+    % Hidden update which shows only in the history of changes
+    \VCChange[disable]{type = updated, version = example-a, description = {Floating environments are no long supported.}}The use in floats is complex and will not be supported.\ldots
+\end{tcblisting}
+
+\begin{macro}{VCPrintChanges}
+    The \Macro{VCPrintChanges} creates an unnumbered section called \textit{Change History} and presents the registered changes.
+
+    The order of the versions is defined by the order of creation with \MacroRef{VCRegisterVersion}. The individual changes are in order of appearance in the document.
+
+    A two-pass compilation is needed to update the listing.
+\end{macro}
+
+\begin{tcblisting}{}
+    \VCPrintChanges
+\end{tcblisting}
+
+\begin{tcblisting}{}
+    \begingroup
+    \VCSet{
+        version prefix = {Version:~},
+        version style = \color{blue}\small,
+        change style = \color{red}\footnotesize,
+    }
+    \VCPrintChanges
+    \endgroup
+\end{tcblisting}
+
+\printindex
 
 
 \end{document}

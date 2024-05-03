@@ -1,4 +1,4 @@
 # versionchanges
-An easy way to keep version changes in a document
+This is a package to record changes in a document.
 
-# Not working; working in progress!
+This code is $\textsf{\large\color{red}under development}$ and it's not ready for the general public.
