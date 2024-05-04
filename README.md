@@ -4,7 +4,9 @@ This is a package for recording changes to the versions of a document. The goal 
 
 ## How to use
 
-Download `versionchanges.sty` and put it somewhere in your $\TeX$ path. The add this line to the preamble of the document source code.
+Download `versionchanges.sty` and put it somewhere in your $\TeX$ path. The add this line to the preamble of the document source code:
+
+`\usepackage{versionchanges}`
 
 ## Licence
 Copyright (C) 2019-2023 by Jander Moreira (moreira.jander@gmail.com)
